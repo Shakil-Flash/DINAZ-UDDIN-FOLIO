@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { projectRecords } from "@/config/projects";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
@@ -184,23 +185,35 @@ export function ProjectsSection() {
                     ))}
                   </div>
 
-                  {project.links && project.links.length > 0 && (
-                    <div className="flex items-center gap-2">
-                      {project.links.map((link) => (
-                        <a
-                          key={link.url}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs font-mono text-[#b4ff39] hover:underline"
-                        >
-                          <FolderGit2 className="h-3.5 w-3.5" />
-                          <span>{link.label}</span>
-                          <ArrowUpRight className="h-3 w-3" />
-                        </a>
-                      ))}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-3">
+                    {project.status === "published" && (
+                      <Link
+                        href={`/projects/${project.slug}`}
+                        className="inline-flex items-center gap-1.5 text-xs font-mono text-[#f8fafc] hover:text-[#b4ff39] transition-colors"
+                      >
+                        <span>Case Study Blueprint</span>
+                        <ArrowUpRight className="h-3.5 w-3.5 text-[#b4ff39]" />
+                      </Link>
+                    )}
+
+                    {project.links && project.links.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        {project.links.map((link) => (
+                          <a
+                            key={link.url}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs font-mono text-[#b4ff39] hover:underline"
+                          >
+                            <FolderGit2 className="h-3.5 w-3.5" />
+                            <span>{link.label}</span>
+                            <ArrowUpRight className="h-3 w-3" />
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </article>
             );
