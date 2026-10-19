@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { prefersReducedMotion } from "@/components/animations/gsap-init";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ArrowRight, Terminal, Cpu, Layers, ShieldCheck } from "lucide-react";
+import { ArrowRight, Terminal, Zap, ShieldAlert, FileCode2, Layers } from "lucide-react";
 
 interface HeroProps {
   onOpenChat?: () => void;
@@ -74,6 +74,7 @@ export function Hero({ onOpenChat }: HeroProps) {
       ref={containerRef}
       id="overview"
       className="relative flex min-h-[calc(100vh-4rem)] flex-col justify-center overflow-hidden px-4 py-16 sm:px-6 sm:py-24 lg:px-8"
+      aria-labelledby="hero-heading"
     >
       {/* Background Architectural Grid Pattern */}
       <div
@@ -90,16 +91,16 @@ export function Hero({ onOpenChat }: HeroProps) {
               {siteConfig.role.toUpperCase()}
             </span>
             <span className="text-xs font-mono uppercase tracking-widest text-[#64748b]">
-              Phase 01 // Foundation
+              Phase 02 // Engineering Identity
             </span>
           </div>
 
           {/* Main Editorial Headline */}
           <div className="hero-title flex flex-col gap-2">
-            <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
-              <span className="block text-[#f8fafc]">Disciplined Engineering.</span>
+            <h1 id="hero-heading" className="text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
+              <span className="block text-[#f8fafc]">Electrical Engineering Rigor.</span>
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#b4ff39] via-[#d7ff7d] to-[#f8fafc]">
-                Precision Digital Systems.
+                Disciplined Systems Architecture.
               </span>
             </h1>
           </div>
@@ -107,10 +108,10 @@ export function Hero({ onOpenChat }: HeroProps) {
           {/* Positioning Statement */}
           <div className="hero-description max-w-2xl">
             <p className="text-lg leading-relaxed text-[#94a3b8] sm:text-xl">
-              I am <strong className="font-semibold text-[#f8fafc]">{siteConfig.name}</strong>, a{" "}
+              I am <strong className="font-semibold text-[#f8fafc]">{siteConfig.name}</strong>, an{" "}
               <span className="text-[#b4ff39] font-medium">{siteConfig.role}</span> dedicated to
-              clean architectural foundations, rigorous engineering standards, and high-performance
-              modern web applications.
+              fundamental circuit principles, protective switchgear coordination, safe industrial installations,
+              and disciplined technical execution.
             </p>
           </div>
 
@@ -120,12 +121,12 @@ export function Hero({ onOpenChat }: HeroProps) {
               variant="primary"
               size="lg"
               onClick={() => {
-                const target = document.getElementById("engineering");
+                const target = document.getElementById("philosophy");
                 target?.scrollIntoView({ behavior: "smooth" });
               }}
               className="gap-2"
             >
-              <span>Explore Foundations</span>
+              <span>Explore Principles</span>
               <ArrowRight className="h-4 w-4" />
             </Button>
 
@@ -136,17 +137,61 @@ export function Hero({ onOpenChat }: HeroProps) {
               className="gap-2"
             >
               <Terminal className="h-4 w-4 text-[#b4ff39]" />
-              <span>Ask Portfolio Assistant</span>
+              <span>Ask Assistant</span>
             </Button>
           </div>
         </div>
 
         {/* Engineering Specification Grid */}
         <div
-          id="engineering"
           className="mt-20 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 pt-8 border-t border-white/10"
         >
-          <div className="hero-spec-card rounded-xl border border-white/10 bg-[#11141e]/90 p-5 backdrop-blur-sm transition-all hover:border-[#b4ff39]/40 hover:bg-[#181c2b]">
+          <div className="hero-spec-card rounded-xl border border-white/10 bg-[#111420]/90 p-5 backdrop-blur-sm transition-all hover:border-[#b4ff39]/40 hover:bg-[#181c2b]">
+            <div className="flex items-center gap-3 text-[#b4ff39]">
+              <Zap className="h-5 w-5" />
+              <span className="font-mono text-xs uppercase tracking-wider text-[#94a3b8]">
+                Discipline
+              </span>
+            </div>
+            <h3 className="mt-3 text-base font-semibold text-[#f8fafc]">
+              Circuit Analysis
+            </h3>
+            <p className="mt-1 text-xs text-[#94a3b8] leading-relaxed">
+              AC/DC network theory, star-delta configurations, transformer losses, and three-phase power calculations.
+            </p>
+          </div>
+
+          <div className="hero-spec-card rounded-xl border border-white/10 bg-[#111420]/90 p-5 backdrop-blur-sm transition-all hover:border-[#b4ff39]/40 hover:bg-[#181c2b]">
+            <div className="flex items-center gap-3 text-[#b4ff39]">
+              <ShieldAlert className="h-5 w-5" />
+              <span className="font-mono text-xs uppercase tracking-wider text-[#94a3b8]">
+                Protection
+              </span>
+            </div>
+            <h3 className="mt-3 text-base font-semibold text-[#f8fafc]">
+              Safety & Earthing
+            </h3>
+            <p className="mt-1 text-xs text-[#94a3b8] leading-relaxed">
+              Low-resistance grounding pits, equipotential bonding, breaker trip curve matching, and LOTO compliance.
+            </p>
+          </div>
+
+          <div className="hero-spec-card rounded-xl border border-white/10 bg-[#111420]/90 p-5 backdrop-blur-sm transition-all hover:border-[#b4ff39]/40 hover:bg-[#181c2b]">
+            <div className="flex items-center gap-3 text-[#b4ff39]">
+              <FileCode2 className="h-5 w-5" />
+              <span className="font-mono text-xs uppercase tracking-wider text-[#94a3b8]">
+                Documentation
+              </span>
+            </div>
+            <h3 className="mt-3 text-base font-semibold text-[#f8fafc]">
+              SLDs & Schematics
+            </h3>
+            <p className="mt-1 text-xs text-[#94a3b8] leading-relaxed">
+              Drafting single-line power flows, motor starter control loops, ferrule terminal maps, and bill of quantities.
+            </p>
+          </div>
+
+          <div className="hero-spec-card rounded-xl border border-white/10 bg-[#111420]/90 p-5 backdrop-blur-sm transition-all hover:border-[#b4ff39]/40 hover:bg-[#181c2b]">
             <div className="flex items-center gap-3 text-[#b4ff39]">
               <Layers className="h-5 w-5" />
               <span className="font-mono text-xs uppercase tracking-wider text-[#94a3b8]">
@@ -154,55 +199,10 @@ export function Hero({ onOpenChat }: HeroProps) {
               </span>
             </div>
             <h3 className="mt-3 text-base font-semibold text-[#f8fafc]">
-              Next.js App Router
+              Digital Engineering
             </h3>
             <p className="mt-1 text-xs text-[#94a3b8] leading-relaxed">
-              React Server Components by default with explicit client boundaries and Turbopack bundler.
-            </p>
-          </div>
-
-          <div className="hero-spec-card rounded-xl border border-white/10 bg-[#11141e]/90 p-5 backdrop-blur-sm transition-all hover:border-[#b4ff39]/40 hover:bg-[#181c2b]">
-            <div className="flex items-center gap-3 text-[#b4ff39]">
-              <ShieldCheck className="h-5 w-5" />
-              <span className="font-mono text-xs uppercase tracking-wider text-[#94a3b8]">
-                Type Discipline
-              </span>
-            </div>
-            <h3 className="mt-3 text-base font-semibold text-[#f8fafc]">
-              Strict TypeScript
-            </h3>
-            <p className="mt-1 text-xs text-[#94a3b8] leading-relaxed">
-              Full type safety across all components, layout props, and API boundary definitions.
-            </p>
-          </div>
-
-          <div className="hero-spec-card rounded-xl border border-white/10 bg-[#11141e]/90 p-5 backdrop-blur-sm transition-all hover:border-[#b4ff39]/40 hover:bg-[#181c2b]">
-            <div className="flex items-center gap-3 text-[#b4ff39]">
-              <Cpu className="h-5 w-5" />
-              <span className="font-mono text-xs uppercase tracking-wider text-[#94a3b8]">
-                Motion Engine
-              </span>
-            </div>
-            <h3 className="mt-3 text-base font-semibold text-[#f8fafc]">
-              GSAP 3 Scoped
-            </h3>
-            <p className="mt-1 text-xs text-[#94a3b8] leading-relaxed">
-              Browser-isolated animations with React strict mode safety and reduced-motion compliance.
-            </p>
-          </div>
-
-          <div className="hero-spec-card rounded-xl border border-white/10 bg-[#11141e]/90 p-5 backdrop-blur-sm transition-all hover:border-[#b4ff39]/40 hover:bg-[#181c2b]">
-            <div className="flex items-center gap-3 text-[#b4ff39]">
-              <Terminal className="h-5 w-5" />
-              <span className="font-mono text-xs uppercase tracking-wider text-[#94a3b8]">
-                Intelligence
-              </span>
-            </div>
-            <h3 className="mt-3 text-base font-semibold text-[#f8fafc]">
-              Vercel AI Engine
-            </h3>
-            <p className="mt-1 text-xs text-[#94a3b8] leading-relaxed">
-              Server-enforced streaming backend with abuse protection and rate-limiting safeguards.
+              Next.js 16 with strict TypeScript, isolated GSAP motion, and streaming AI assistant capabilities.
             </p>
           </div>
         </div>

@@ -4,9 +4,12 @@ import * as React from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/sections/Hero";
+import { PhilosophySection } from "@/components/sections/PhilosophySection";
+import { CompetenciesSection } from "@/components/sections/CompetenciesSection";
+import { ProjectsSection } from "@/components/sections/ProjectsSection";
 import { ChatWidget } from "@/components/chat/ChatWidget";
 import { siteConfig } from "@/config/site";
-import { ArrowUpRight, Code, Shield, Cpu } from "lucide-react";
+import { ArrowUpRight, Terminal, Mail } from "lucide-react";
 
 export function PageShell() {
   const [chatOpen, setChatOpen] = React.useState(false);
@@ -20,89 +23,43 @@ export function PageShell() {
         {/* Scoped GSAP Hero Section */}
         <Hero onOpenChat={() => setChatOpen(true)} />
 
-        {/* Foundations Overview Section */}
-        <section
-          id="projects"
-          className="relative border-t border-white/[0.08] bg-[#0c0e17] py-20 px-4 sm:px-6 lg:px-8"
-        >
-          <div className="mx-auto max-w-7xl">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-              <div>
-                <div className="flex items-center gap-2 text-[#b4ff39] font-mono text-xs tracking-wider uppercase mb-2">
-                  <span>[ 02 // DISCIPLINES ]</span>
-                </div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#f8fafc]">
-                  Engineering Tenets & Standards
-                </h2>
-              </div>
-              <p className="text-sm text-[#94a3b8] max-w-md">
-                Disciplined foundations established in Phase 01 to support future case studies and systems work.
-              </p>
-            </div>
+        {/* Phase 02: Engineering Philosophy & Principles */}
+        <PhilosophySection />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="rounded-2xl border border-white/10 bg-[#111420] p-6 hover:border-white/20 transition-all">
-                <div className="h-10 w-10 rounded-xl bg-[#b4ff39]/10 border border-[#b4ff39]/30 flex items-center justify-center text-[#b4ff39] mb-4">
-                  <Code className="h-5 w-5" />
-                </div>
-                <h3 className="text-base font-semibold text-[#f8fafc] mb-2">
-                  Architectural Rigor
-                </h3>
-                <p className="text-xs text-[#94a3b8] leading-relaxed">
-                  Clean server-first separation with React Server Components, minimizing client runtime overhead and guaranteeing predictable data flow.
-                </p>
-              </div>
+        {/* Phase 02: Technical Competencies Framework */}
+        <CompetenciesSection />
 
-              <div className="rounded-2xl border border-white/10 bg-[#111420] p-6 hover:border-white/20 transition-all">
-                <div className="h-10 w-10 rounded-xl bg-[#b4ff39]/10 border border-[#b4ff39]/30 flex items-center justify-center text-[#b4ff39] mb-4">
-                  <Shield className="h-5 w-5" />
-                </div>
-                <h3 className="text-base font-semibold text-[#f8fafc] mb-2">
-                  Security-First API Layer
-                </h3>
-                <p className="text-xs text-[#94a3b8] leading-relaxed">
-                  Strict request payload bounds, origin-independent rate limiting, sanitized message parsing, and isolated server-only environment secrets.
-                </p>
-              </div>
+        {/* Phase 02: Project Case-Study System */}
+        <ProjectsSection />
 
-              <div className="rounded-2xl border border-white/10 bg-[#111420] p-6 hover:border-white/20 transition-all">
-                <div className="h-10 w-10 rounded-xl bg-[#b4ff39]/10 border border-[#b4ff39]/30 flex items-center justify-center text-[#b4ff39] mb-4">
-                  <Cpu className="h-5 w-5" />
-                </div>
-                <h3 className="text-base font-semibold text-[#f8fafc] mb-2">
-                  Controlled Motion & A11y
-                </h3>
-                <p className="text-xs text-[#94a3b8] leading-relaxed">
-                  Scoped GSAP timelines respecting user motion preferences, avoiding layout shifts, hydration mismatches, and animation flashes.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Planned Milestones / Contact Section */}
+        {/* Technical Communication & Inquiries Section */}
         <section
           id="contact"
-          className="relative border-t border-white/[0.08] bg-[#090a0f] py-20 px-4 sm:px-6 lg:px-8"
+          className="relative border-t border-white/[0.08] bg-[#090a0f] py-24 px-4 sm:px-6 lg:px-8"
+          aria-labelledby="contact-heading"
         >
           <div className="mx-auto max-w-7xl">
-            <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-[#131724] to-[#0e111a] p-8 sm:p-12">
+            <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-[#131724] to-[#0e111a] p-8 sm:p-12 lg:p-16">
               <div className="max-w-2xl">
                 <span className="font-mono text-xs uppercase tracking-widest text-[#b4ff39]">
-                  Communication & Inquiries
+                  [ 05 // COMMUNICATION & INQUIRIES ]
                 </span>
-                <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#f8fafc] sm:text-4xl">
-                  Technical Dialogues & Collaboration
+                <h2
+                  id="contact-heading"
+                  className="mt-3 text-3xl font-bold tracking-tight text-[#f8fafc] sm:text-4xl"
+                >
+                  Technical Consultations & Systems Inquiries
                 </h2>
                 <p className="mt-4 text-sm text-[#94a3b8] leading-relaxed">
-                  Available for technical engineering discussions, systems consultation, and full-stack architecture reviews.
+                  Available for electrical engineering consultations, industrial circuit troubleshooting, panel layout reviews, and technical project collaborations.
                 </p>
 
                 <div className="mt-8 flex flex-wrap items-center gap-4">
                   <a
                     href={`mailto:${siteConfig.links.email}`}
-                    className="inline-flex items-center gap-2 rounded-xl bg-[#b4ff39] px-6 py-3 text-xs font-semibold text-[#090a0f] transition-all hover:bg-[#c4ff4d] shadow-[0_0_20px_rgba(180,255,57,0.25)]"
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#b4ff39] px-6 py-3.5 text-xs font-semibold text-[#090a0f] transition-all hover:bg-[#c4ff4d] shadow-[0_0_20px_rgba(180,255,57,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b4ff39]"
                   >
+                    <Mail className="h-4 w-4" />
                     <span>{siteConfig.links.email}</span>
                     <ArrowUpRight className="h-4 w-4" />
                   </a>
@@ -110,9 +67,10 @@ export function PageShell() {
                   <button
                     type="button"
                     onClick={() => setChatOpen(true)}
-                    className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-[#181c2b] px-6 py-3 text-xs font-medium text-[#f8fafc] transition-all hover:bg-[#202538] hover:border-white/25"
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-[#181c2b] px-6 py-3.5 text-xs font-medium text-[#f8fafc] transition-all hover:bg-[#202538] hover:border-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b4ff39]"
                   >
-                    <span>Launch AI Assistant</span>
+                    <Terminal className="h-4 w-4 text-[#b4ff39]" />
+                    <span>Launch Portfolio Assistant</span>
                   </button>
                 </div>
               </div>

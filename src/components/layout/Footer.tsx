@@ -19,7 +19,7 @@ export function Footer() {
               </span>
             </div>
             <p className="text-xs text-[#64748b] max-w-md">
-              Disciplined technical execution, modern web architecture, and resilient engineering systems.
+              Disciplined electrical engineering execution, rigorous circuit safety standards, and resilient technical systems.
             </p>
           </div>
 
