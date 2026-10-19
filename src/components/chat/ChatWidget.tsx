@@ -68,14 +68,26 @@ export function ChatWidget({
     }
   }, [messages, isOpen, isGenerating]);
 
-  // Focus input when opened
+  // Focus input when opened and add Escape key listener
   React.useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
         inputRef.current?.focus();
       }, 150);
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          if (controlledOnToggle) {
+            controlledOnToggle();
+          } else {
+            setInternalIsOpen(false);
+          }
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
     }
-  }, [isOpen]);
+  }, [isOpen, controlledOnToggle]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

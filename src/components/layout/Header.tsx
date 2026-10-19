@@ -13,7 +13,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Identity / Monogram */}
         <Link
-          href="#overview"
+          href="/#overview"
           className="group flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b4ff39] rounded-md p-1"
         >
           <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-[#11141e] font-mono text-xs font-bold text-[#b4ff39] transition-all group-hover:border-[#b4ff39]/50 group-hover:shadow-[0_0_12px_rgba(180,255,57,0.2)]">

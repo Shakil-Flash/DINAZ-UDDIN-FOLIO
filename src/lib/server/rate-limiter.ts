@@ -1,11 +1,17 @@
 /**
  * Production Rate Limiter Abstraction
  *
- * Supports:
- * 1. Distributed Upstash Redis REST API (when UPSTASH_REDIS_REST_URL & UPSTASH_REDIS_REST_TOKEN are set).
- * 2. Sliding-window in-memory fallback (for single-instance / local development, or when Upstash is unreachable).
+ * Architecture & Policy:
+ * 1. Primary: Distributed Upstash Redis REST API (shared across serverless/edge instances).
+ * 2. In Development/Test (NODE_ENV !== "production"): Safe, fast in-memory sliding window limiter.
+ * 3. In Production (NODE_ENV === "production"):
+ *    - If Redis is configured: Global rate limiting with atomic sorted-set pipeline.
+ *    - If Redis is unconfigured or times out:
+ *      * "fail_closed" policy: Rejects request with HTTP 503 to prevent unmetered floods.
+ *      * "emergency_bounded" policy (default): Bounded per-instance limiter with curtailed quotas
+ *        (emergencyLimit: 2 for contact, 5 for chat) and X-RateLimit-Degraded headers.
  *
- * All external requests are timeout-bounded to prevent blocking serverless executions.
+ * All external requests are timeout-bounded (2000ms max) to prevent blocking execution.
  */
 
 interface RateLimitRecord {
@@ -29,12 +35,23 @@ if (typeof setInterval !== "undefined") {
   }, 60_000).unref?.();
 }
 
+export type RateLimitFallbackPolicy = "fail_closed" | "emergency_bounded";
+
+export interface RateLimitOptions {
+  limit?: number;
+  windowMs?: number;
+  fallbackPolicy?: RateLimitFallbackPolicy;
+  emergencyLimit?: number;
+}
+
 export interface RateLimitResult {
   success: boolean;
   limit: number;
   remaining: number;
   reset: number;
-  store: "upstash_redis" | "memory";
+  store: "upstash_redis" | "memory_development" | "emergency_bounded" | "unconfigured";
+  degraded?: boolean;
+  error?: string;
 }
 
 /**
@@ -80,7 +97,8 @@ function isValidIp(ip: string): boolean {
 export function checkMemoryRateLimit(
   identifier: string,
   limit = 20,
-  windowMs = 60_000
+  windowMs = 60_000,
+  storeType: "memory_development" | "emergency_bounded" = "memory_development"
 ): RateLimitResult {
   const now = Date.now();
   const windowStart = now - windowMs;
@@ -96,7 +114,8 @@ export function checkMemoryRateLimit(
       limit,
       remaining: 0,
       reset: Math.max(reset, 1),
-      store: "memory",
+      store: storeType,
+      degraded: storeType === "emergency_bounded",
     };
   }
 
@@ -108,25 +127,42 @@ export function checkMemoryRateLimit(
     limit,
     remaining: limit - recentTimestamps.length,
     reset: Math.ceil(windowMs / 1000),
-    store: "memory",
+    store: storeType,
+    degraded: storeType === "emergency_bounded",
   };
 }
 
-let hasLoggedMemoryLimiterNotice = false;
+let hasLoggedProductionNotice = false;
 
 /**
  * Primary rate limiting function.
- * Automatically utilizes Upstash Redis if configured; falls back safely to memory limiter.
+ * Automatically queries Upstash Redis in production; applies deliberate fallback policy if absent.
  */
 export async function checkRateLimit(
   identifier: string,
-  limit = 20,
-  windowMs = 60_000
+  limitOrOptions?: number | RateLimitOptions,
+  optionalWindowMs?: number
 ): Promise<RateLimitResult> {
+  const options: RateLimitOptions =
+    typeof limitOrOptions === "object" && limitOrOptions !== null
+      ? limitOrOptions
+      : {
+          limit: typeof limitOrOptions === "number" ? limitOrOptions : 20,
+          windowMs: typeof optionalWindowMs === "number" ? optionalWindowMs : 60_000,
+        };
+
+  const limit = options.limit ?? 20;
+  const windowMs = options.windowMs ?? 60_000;
+  const fallbackPolicy: RateLimitFallbackPolicy =
+    options.fallbackPolicy ??
+    (process.env.RATE_LIMIT_STRICT === "true" ? "fail_closed" : "emergency_bounded");
+  const emergencyLimit = options.emergencyLimit ?? Math.max(1, Math.floor(limit / 3));
+
+  const isProduction = process.env.NODE_ENV === "production";
   const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
   const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  // Use Upstash Redis REST API when configured
+  // 1. Production Mode with Redis configured
   if (redisUrl && redisToken && !redisUrl.includes("placeholder")) {
     try {
       const now = Date.now();
@@ -185,15 +221,34 @@ export async function checkRateLimit(
         };
       }
     } catch {
-      // If Upstash Redis is unreachable or times out, gracefully fall back to in-memory limiter
+      // Redis network error / timeout fallthrough to policy check below
     }
-  } else if (!hasLoggedMemoryLimiterNotice && process.env.NODE_ENV === "production") {
-    hasLoggedMemoryLimiterNotice = true;
-    console.warn(
-      "[Security Notice] UPSTASH_REDIS_REST_URL unconfigured. Operating in single-instance memory rate-limiting mode. For multi-region/serverless production scaling, configure Upstash Redis."
-    );
   }
 
-  // Fallback to local memory limiter
-  return checkMemoryRateLimit(identifier, limit, windowMs);
+  // 2. Production fallback handling when Redis is unavailable or unconfigured
+  if (isProduction) {
+    if (!hasLoggedProductionNotice) {
+      hasLoggedProductionNotice = true;
+      console.warn(
+        `[RateLimiter Policy] Production Redis unavailable. Executing policy: '${fallbackPolicy}'.`
+      );
+    }
+
+    if (fallbackPolicy === "fail_closed") {
+      return {
+        success: false,
+        limit: 0,
+        remaining: 0,
+        reset: Math.ceil(windowMs / 1000),
+        store: "unconfigured",
+        error: "Shared rate-limiting infrastructure is required in production.",
+      };
+    }
+
+    // Emergency bounded fallback: strictly tightened quota prevents flood abuse
+    return checkMemoryRateLimit(identifier, emergencyLimit, windowMs, "emergency_bounded");
+  }
+
+  // 3. Non-production / Local Development / Testing environment
+  return checkMemoryRateLimit(identifier, limit, windowMs, "memory_development");
 }

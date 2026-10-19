@@ -101,17 +101,35 @@ To receive real inquiries submitted through the contact form:
 
 ---
 
-## 6. Shared Rate Limiting (Upstash Redis) Setup
+## 6. Shared Rate Limiting (Upstash Redis) & Production Fallback Policy
 
-Next.js route handlers on Vercel execute as isolated serverless micro-containers. To share rate limiting state across all regions:
+Next.js route handlers on Vercel execute as isolated serverless micro-containers. An in-memory store in an ephemeral container cannot defend against distributed traffic across multiple lambdas. Therefore, the application strictly distinguishes between local development and production environments.
 
+### Production Fallback Policies
+
+1. **Standard Production Operation (Shared Redis):**
+   - Configured via `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+   - Executes atomic sorted-set pipelines (`ZREMRANGEBYSCORE`, `ZADD`, `ZCARD`, `EXPIRE`) over HTTP REST with a 2-second timeout.
+   - Shares rate-limit counters instantaneously across all edge regions and serverless instances.
+
+2. **Policy When Redis Is Unconfigured or Temporarily Down in Production:**
+   - **Emergency Bounded Fallback (Default Production Resilience):**
+     - Requests are **never** given unmetered access or treated as if per-process memory was a full shared limiter.
+     - Per-instance quotas are immediately **curtailed by 60–75%** (e.g., maximum 2 submissions per instance for `/api/contact`, 5 messages for `/api/chat`).
+     - Injects response header `X-RateLimit-Degraded: true` and logs a structured warning.
+     - Prevents runaway cloud costs and flood attacks while maintaining basic availability for legitimate users.
+   - **Fail-Closed Mode (`RATE_LIMIT_STRICT=true`):**
+     - If strict compliance is required, setting `RATE_LIMIT_STRICT=true` in Vercel Environment Variables causes API endpoints to immediately reject unmetered requests with `HTTP 503 Service Unavailable` whenever Redis credentials are absent.
+
+3. **Local Development & Testing (`NODE_ENV !== "production"`):**
+   - Automatically uses the local sliding-window in-memory limiter without external network dependencies or credentials.
+
+### Setup Steps:
 1. Create a free serverless Redis database at [Upstash Console](https://console.upstash.com).
-2. In database details, locate **REST API** section.
-3. Copy:
+2. Under **REST API**, copy:
    - `UPSTASH_REDIS_REST_URL`
    - `UPSTASH_REDIS_REST_TOKEN`
-4. Add both to Vercel Environment Variables.
-5. The application will automatically detect these credentials and route rate limiting through Upstash Redis REST pipelines. If Upstash is unreachable or keys are absent, the application falls back safely to in-memory limiting without breaking API requests.
+3. Add both to Vercel Environment Variables.
 
 ---
 
@@ -164,3 +182,33 @@ Execute these verification checks after the deployment finishes:
   - In Vercel Dashboard > **Logs**, filter by `/api/contact` or `/api/chat` to diagnose runtime status codes.
   - Notice that API routes do not log email bodies or private tokens.
 - **Cache Invalidation**: Vercel automatically invalidates static caches on new deployments. If needed, trigger **Redeploy > Clear build cache**.
+
+---
+
+## 10. Actionable Launch Checklist
+
+### Category A: Verified Complete (Automated & Tested in Repository)
+- [x] Full build verification passing with zero TypeScript and ESLint errors (`npm run build`).
+- [x] 28/28 unit and integration tests passing (`npm test`).
+- [x] Draft case-study publication isolation (`notFound()` for draft slugs).
+- [x] Dynamic `/sitemap.xml` strictly indexes published work with canonical URLs.
+- [x] Validated `/robots.txt` disallows `/api/` endpoints from web indexing.
+- [x] Social preview image (`public/images/og-image.png`) generated at 1200×630 with verified identity.
+- [x] Vercel security headers configured in `vercel.json` (HSTS, nosniff, frame denial).
+- [x] Rate limiter supports Upstash Redis REST and graceful emergency-bounded fallback with degraded headers.
+- [x] Contact delivery deduplication and safe error masking.
+
+### Category B: Requires External Account or Credential
+- [ ] **Resend API Key (`RESEND_API_KEY`)**: Create key at [resend.com](https://resend.com) to activate inbox delivery. *(If omitted: form operates in safe demonstration mode).*
+- [ ] **AI Assistant Key (`AI_API_KEY`)**: Add OpenAI/OpenRouter key to activate live assistant responses. *(If omitted: UI displays transparent offline notice).*
+- [ ] **Upstash Redis (`UPSTASH_REDIS_REST_URL` & `TOKEN`)**: Create free database at [upstash.com](https://upstash.com) to synchronize rate limits across distributed serverless regions. *(If omitted: emergency bounded limiter protects instances).*
+
+### Category C: Requires DNS / Domain-Owner Action
+- [ ] In domain registrar, configure apex (`@`) A record to Vercel IP and `www` CNAME to `cname.vercel-dns.com`.
+- [ ] In Resend dashboard, add `dinazuddin.dev` and enter the 3 verification DNS records (1 MX, 2 TXT) into registrar DNS.
+- [ ] Once Resend verifies domain, update `CONTACT_EMAIL_FROM="Dinaz Uddin <contact@dinazuddin.dev>"`.
+
+### Category D: Not Tested or Still Blocked
+- [ ] **Live End-to-End Inbox Receipt**: Cannot be verified until a real `RESEND_API_KEY` is provided. Tested via unconfigured/simulated 503 fallback.
+- [ ] **Headless Browser Automation (Playwright)**: Blocked in this local environment due to upstream download mirror 404 on Windows. Verified via 28 automated unit tests and manual curl/PowerShell HTTP checks.
+

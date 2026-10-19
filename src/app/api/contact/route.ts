@@ -15,11 +15,25 @@ export async function POST(req: NextRequest) {
 
     const rateLimit = await checkRateLimit(
       `contact_${clientIp}`,
-      RATE_LIMIT_REQUESTS,
-      RATE_LIMIT_WINDOW_MS
+      {
+        limit: RATE_LIMIT_REQUESTS,
+        windowMs: RATE_LIMIT_WINDOW_MS,
+        fallbackPolicy: process.env.RATE_LIMIT_STRICT === "true" ? "fail_closed" : "emergency_bounded",
+        emergencyLimit: 2,
+      }
     );
 
     if (!rateLimit.success) {
+      if (rateLimit.store === "unconfigured") {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Security rate-limiting service is temporarily unavailable in production.",
+          },
+          { status: 503 }
+        );
+      }
+
       return NextResponse.json(
         {
           success: false,
@@ -32,6 +46,7 @@ export async function POST(req: NextRequest) {
             "Retry-After": rateLimit.reset.toString(),
             "X-RateLimit-Limit": rateLimit.limit.toString(),
             "X-RateLimit-Remaining": "0",
+            ...(rateLimit.degraded ? { "X-RateLimit-Degraded": "true" } : {}),
           },
         }
       );
@@ -183,6 +198,7 @@ export async function POST(req: NextRequest) {
         headers: {
           "X-RateLimit-Limit": rateLimit.limit.toString(),
           "X-RateLimit-Remaining": rateLimit.remaining.toString(),
+          ...(rateLimit.degraded ? { "X-RateLimit-Degraded": "true" } : {}),
         },
       }
     );

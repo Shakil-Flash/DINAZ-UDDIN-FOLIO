@@ -50,11 +50,12 @@ export const siteConfig: SiteConfig = {
     "Portfolio of Dinaz Uddin, Electrical Diploma Engineer. Focused on electrical systems engineering, technical rigor, and resilient digital architectures.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://dinazuddin.dev",
   navItems: [
-    { label: "Overview", href: "#overview" },
-    { label: "Philosophy", href: "#philosophy" },
-    { label: "Competencies", href: "#competencies" },
-    { label: "Projects", href: "#projects" },
-    { label: "Contact", href: "#contact" },
+    { label: "Overview", href: "/#overview" },
+    { label: "Philosophy", href: "/#philosophy" },
+    { label: "Competencies", href: "/#competencies" },
+    { label: "SLD Explorer", href: "/#distribution-sld" },
+    { label: "Projects", href: "/#projects" },
+    { label: "Contact", href: "/#contact" },
   ],
   verifiedProfile: {
     fullName: "Dinaz Uddin",
@@ -71,7 +72,7 @@ export const siteConfig: SiteConfig = {
     },
   },
   links: {
-    github: "https://github.com",
+    github: "https://github.com/Shakil-Flash/DINAZ-UDDIN-FOLIO",
     linkedin: "https://linkedin.com",
     email: "contact@dinazuddin.dev",
   },
