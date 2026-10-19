@@ -2,28 +2,47 @@
 
 @layer base {
   :root {
+    /* Surface & Canvas Tokens */
     --bg-canvas: #090a0f;
     --bg-surface: #11141e;
     --bg-elevated: #181c2b;
     --bg-muted: #1f2537;
+    --bg-overlay: rgba(9, 10, 15, 0.85);
 
+    /* Border & Structural Hierarchy */
     --border-subtle: rgba(255, 255, 255, 0.08);
     --border-medium: rgba(255, 255, 255, 0.16);
     --border-accent: rgba(180, 255, 57, 0.35);
 
+    /* Electric Lime Accent Tokens (Precision Electrical Palette) */
     --accent-lime: #b4ff39;
     --accent-lime-hover: #c4ff4d;
     --accent-lime-dim: rgba(180, 255, 57, 0.12);
     --accent-lime-glow: rgba(180, 255, 57, 0.25);
 
+    /* Technical Status Indicators */
+    --status-confirmed: #b4ff39;
+    --status-pending: #f59e0b;
+    --status-evaluating: #38bdf8;
+    --status-neutral: #64748b;
+
+    /* Semantic Typography Hierarchy */
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
 
+    /* Radii Conventions */
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 16px;
+    --radius-xl: 24px;
     --radius-full: 9999px;
+
+    /* Motion & Easing Tokens */
+    --motion-fast: 150ms;
+    --motion-normal: 280ms;
+    --motion-slow: 500ms;
+    --motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   * {
@@ -50,6 +69,7 @@
     color: #090a0f;
   }
 
+  /* Universal Reduced Motion Accessibility */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -79,4 +99,28 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #2d364c;
+}
+
+/* Subtle Technical Schematic Grid Background */
+.schematic-grid {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 3rem 3rem;
+}
+
+/* Electrical Accent Node Highlight */
+.node-highlight {
+  position: relative;
+}
+
+.node-highlight::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 2rem;
+  height: 2px;
+  background: var(--accent-lime);
+  box-shadow: 0 0 10px var(--accent-lime-glow);
 }
