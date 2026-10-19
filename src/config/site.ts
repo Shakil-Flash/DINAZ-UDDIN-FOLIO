@@ -48,7 +48,7 @@ export const siteConfig: SiteConfig = {
     "Electrical Diploma Engineer with a disciplined foundation in circuit theory, power distribution systems, electrical safety standards, and modern digital tooling.",
   description:
     "Portfolio of Dinaz Uddin, Electrical Diploma Engineer. Focused on electrical systems engineering, technical rigor, and resilient digital architectures.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://dinazuddin.dev",
   navItems: [
     { label: "Overview", href: "#overview" },
     { label: "Philosophy", href: "#philosophy" },

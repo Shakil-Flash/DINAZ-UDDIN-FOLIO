@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { streamText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
-import { checkRateLimit } from "@/lib/server/rate-limiter";
+import { checkRateLimit, getClientIp } from "@/lib/server/rate-limiter";
 
 // Server-enforced system prompt. The client CANNOT override this.
 const SYSTEM_PROMPT = `You are the technical portfolio assistant for Dinaz Uddin.
@@ -59,13 +59,10 @@ function extractMessageContent(msg: unknown): string | null {
 export async function POST(req: NextRequest) {
   try {
     // 1. Abuse protection / Rate limiting by client IP
-    const clientIp =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      req.headers.get("x-real-ip") ||
-      "127.0.0.1";
+    const clientIp = getClientIp(req.headers);
 
-    const rateLimit = checkRateLimit(
-      clientIp,
+    const rateLimit = await checkRateLimit(
+      `chat_${clientIp}`,
       RATE_LIMIT_REQUESTS,
       RATE_LIMIT_WINDOW_MS
     );

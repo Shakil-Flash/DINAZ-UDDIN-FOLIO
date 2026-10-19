@@ -30,15 +30,37 @@ export async function generateMetadata({
   if (!project || project.status !== "published") {
     return {
       title: `Project Not Found — ${siteConfig.name}`,
+      robots: {
+        index: false,
+        follow: false,
+      },
     };
   }
 
   return {
     title: `${project.title} — ${siteConfig.name}`,
     description: project.summary,
+    alternates: {
+      canonical: `/projects/${project.slug}`,
+    },
     openGraph: {
       title: `${project.title} — ${siteConfig.name}`,
       description: project.summary,
+      url: `${siteConfig.url}/projects/${project.slug}`,
+      images: [
+        {
+          url: "/images/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: `${project.title} — ${siteConfig.name}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} — ${siteConfig.name}`,
+      description: project.summary,
+      images: ["/images/og-image.png"],
     },
   };
 }

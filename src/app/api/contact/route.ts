@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimit } from "@/lib/server/rate-limiter";
+import { checkRateLimit, getClientIp } from "@/lib/server/rate-limiter";
 import { deliverContactMessage } from "@/lib/server/contact-provider";
 
 const MAX_PAYLOAD_BYTES = 50_000; // 50 KB
@@ -11,12 +11,9 @@ const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export async function POST(req: NextRequest) {
   try {
     // 1. IP extraction and rate limiting
-    const clientIp =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      req.headers.get("x-real-ip") ||
-      "127.0.0.1";
+    const clientIp = getClientIp(req.headers);
 
-    const rateLimit = checkRateLimit(
+    const rateLimit = await checkRateLimit(
       `contact_${clientIp}`,
       RATE_LIMIT_REQUESTS,
       RATE_LIMIT_WINDOW_MS
@@ -178,9 +175,16 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         configured: true,
-        message: "Your message has been securely transmitted. Thank you for reaching out.",
+        providerAccepted: delivery.providerAccepted ?? true,
+        message: "Your message has been accepted for transmission. Thank you for reaching out.",
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          "X-RateLimit-Limit": rateLimit.limit.toString(),
+          "X-RateLimit-Remaining": rateLimit.remaining.toString(),
+        },
+      }
     );
   } catch {
     // Avoid logging sensitive personal data or secrets

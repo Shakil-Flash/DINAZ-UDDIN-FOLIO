@@ -40,19 +40,19 @@ test("Contact Security - Honeypot Trap Rejection", () => {
   assert.strictEqual(isHoneypotTriggered("https://malicious-link.com"), true, "Link honeypot must trigger bot detection");
 });
 
-test("Contact Security - Sliding Window Rate Limiter", () => {
+test("Contact Security - Sliding Window Rate Limiter", async () => {
   const testIp = `test_ip_${Date.now()}`;
   const limit = 3;
   const windowMs = 5000;
 
   // First 3 requests must succeed
   for (let i = 0; i < limit; i++) {
-    const res = checkRateLimit(testIp, limit, windowMs);
+    const res = await checkRateLimit(testIp, limit, windowMs);
     assert.strictEqual(res.success, true, `Request ${i + 1} should be within limit`);
   }
 
   // 4th request must be rejected
-  const blockedRes = checkRateLimit(testIp, limit, windowMs);
+  const blockedRes = await checkRateLimit(testIp, limit, windowMs);
   assert.strictEqual(blockedRes.success, false, "4th request should exceed rate limit");
   assert.strictEqual(blockedRes.remaining, 0);
   assert.ok(blockedRes.reset > 0, "Reset delay should be greater than zero");
